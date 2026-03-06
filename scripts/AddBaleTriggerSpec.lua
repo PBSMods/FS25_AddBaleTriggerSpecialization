@@ -66,13 +66,31 @@ function AddBaleTriggerSpec:onBaleTriggerCallback(triggerId, otherId, onEnter, o
 end
 
 -- Registrierung an alle Placeables
-PlaceableTypeManager.validatePlaceableTypes = Utils.appendedFunction(
-    PlaceableTypeManager.validatePlaceableTypes,
-    function(self)
-        for typeName, typeEntry in pairs(self.placeableTypes) do
-            if SpecializationUtil.hasSpecialization(Storage, typeEntry.specializations) then
-                typeEntry:addSpecialization("AddBaleTriggerSpec")
-            end
+TypeManager.validateTypes = Utils.appendedFunction(
+  TypeManager.validateTypes,
+  function(self)
+    -- Nur ausführen, wenn der aktuelle Manager der PlaceableTypeManager ist
+    if self == g_placeableTypeManager then
+      for typeName, typeEntry in pairs(self.types) do
+        -- Prüfe, ob die Spezialisierung "storage" in diesem Placeable-Typ existiert
+        if typeEntry.specializationsByName ~= nil and typeEntry.specializationsByName["storage"] then
+          -- Hänge die neue Spezialisierung dynamisch an
+          self:addSpecializationToType("AddBaleTriggerSpec", typeName)
         end
+      end
     end
+  end
 )
+
+-- Registrierung an alle Placeables
+--PlaceableTypeManager.validatePlaceableTypes = Utils.appendedFunction(
+--    PlaceableTypeManager.validatePlaceableTypes,
+--    function(self)
+--        for typeName, typeEntry in pairs(self.placeableTypes) do
+--            if SpecializationUtil.hasSpecialization(Storage, typeEntry.specializations) then
+--                typeEntry:addSpecialization("AddBaleTriggerSpec")
+--            end
+--        end
+--    end
+--)
+
